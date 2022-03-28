@@ -25,13 +25,7 @@ const ExpenseForm = () => {
             onChangeText: amountHandler,
           }}
         />
-        <Input
-          label="Description"
-          textInputConfig={{
-            onChangeText: descriptionHandler,
-            multiline: true,
-          }}
-        />
+
         <Input
           label="Date"
           textInputConfig={{
@@ -39,6 +33,13 @@ const ExpenseForm = () => {
             maxLength: "10",
             placeholder: "YYYY-MM-DD",
             placeholderTextColor: "#ffffff",
+          }}
+        />
+        <Input
+          label="Description"
+          textInputConfig={{
+            onChangeText: descriptionHandler,
+            multiline: true,
           }}
         />
       </View>
