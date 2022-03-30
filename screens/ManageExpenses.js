@@ -9,6 +9,9 @@ import ExpenseForm from "../components/ExpenseForm";
 const ManageExpenses = ({ route, navigation }) => {
   const expenseid = route.params?.expenseId;
   const expenseCtx = useContext(ExpenseContext);
+  const selectedExpense = expenseCtx.expenses.find(
+    (expense) => expense.id === expenseid
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -25,19 +28,11 @@ const ManageExpenses = ({ route, navigation }) => {
     navigation.goBack();
   };
 
-  const confirmHandler = () => {
+  const confirmHandler = (data) => {
     if (expenseid) {
-      expenseCtx.updateExpense(expenseid, {
-        description: "Test!!",
-        amount: 55.09,
-        date: new Date("2022-03-03"),
-      });
+      expenseCtx.updateExpense(expenseid, data);
     } else {
-      expenseCtx.addExpense({
-        description: "Test add",
-        amount: 55.09,
-        date: new Date("2022-03-03"),
-      });
+      expenseCtx.addExpense(data);
     }
     navigation.goBack();
   };
@@ -45,15 +40,12 @@ const ManageExpenses = ({ route, navigation }) => {
   return (
     <>
       <View style={styles.container}>
-        <ExpenseForm />
-        <View style={styles.buttonContainer}>
-          <Button style={styles.button} mode="flat" onPress={cancelHandler}>
-            Cancel
-          </Button>
-          <Button style={styles.button} onPress={confirmHandler}>
-            {expenseid ? "Update" : "Save"}
-          </Button>
-        </View>
+        <ExpenseForm
+          buttonLabel={expenseid ? "Update" : "Save"}
+          cancelHandler={cancelHandler}
+          confirmHandler={confirmHandler}
+          defaultValues={selectedExpense}
+        />
         {expenseid && (
           <>
             <View style={styles.trashButton}>
@@ -84,15 +76,6 @@ const styles = StyleSheet.create({
     borderTopColor: GlobalStyles.colors.primary200,
     alignItems: "center",
     justifyContent: "center",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  button: {
-    minWidth: 120,
-    marginHorizontal: 8,
   },
 });
 

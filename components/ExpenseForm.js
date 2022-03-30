@@ -1,18 +1,43 @@
-import react from "react";
-import { View, Text, StyleSheet } from "react-native";
+import react, { useState } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
+import Button from "./Button";
 import Input from "./Input";
+import { dateFormatter } from "../util/dateFormatter";
 
-const ExpenseForm = () => {
-  const amountHandler = (text) => {
-    console.log(text);
+const ExpenseForm = ({
+  buttonLabel,
+  cancelHandler,
+  confirmHandler,
+  defaultValues,
+}) => {
+  const [expenseInput, setExpenseInput] = useState({
+    amount: defaultValues ? defaultValues.amount.toString() : "",
+    date: defaultValues ? dateFormatter(defaultValues.date) : "",
+    description: defaultValues ? defaultValues.description : "",
+  });
+
+  const expenseHandler = (identifier, text) => {
+    setExpenseInput((prevData) => ({
+      ...prevData,
+      [identifier]: text,
+    }));
   };
 
-  const descriptionHandler = (text) => {
-    console.log(text);
-  };
+  const confirmInputHandler = () => {
+    let expenseData = {
+      amount: +expenseInput.amount,
+      date: new Date(expenseInput.date),
+      description: expenseInput.description,
+    };
+    const isValidAmount = !isNaN(expenseData.amount) && expenseData.amount > 0;
+    const isValidDate = expenseData.date.toString() !== "Invalid Date";
+    const isValidDescription = expenseData.description.trim().length > 0;
 
-  const dateHandler = (text) => {
-    console.log(text);
+    if (!isValidAmount || !isValidDate || !isValidDescription) {
+      Alert.alert("Invalid Input", "Plss check Your input values");
+      return;
+    }
+    confirmHandler(expenseData);
   };
 
   return (
@@ -22,31 +47,52 @@ const ExpenseForm = () => {
           label="Amount"
           textInputConfig={{
             keyboardType: "number-pad",
-            onChangeText: amountHandler,
+            onChangeText: expenseHandler.bind(this, "amount"),
+            value: expenseInput.amount,
           }}
         />
 
         <Input
           label="Date"
           textInputConfig={{
-            onChangeText: dateHandler,
-            maxLength: "10",
+            onChangeText: expenseHandler.bind(this, "date"),
+            maxLength: 10,
             placeholder: "YYYY-MM-DD",
             placeholderTextColor: "#ffffff",
+            value: expenseInput.date,
           }}
         />
         <Input
           label="Description"
           textInputConfig={{
-            onChangeText: descriptionHandler,
+            onChangeText: expenseHandler.bind(this, "description"),
             multiline: true,
+            value: expenseInput.description,
           }}
         />
+        <View style={styles.buttonContainer}>
+          <Button style={styles.button} mode="flat" onPress={cancelHandler}>
+            Cancel
+          </Button>
+          <Button style={styles.button} onPress={confirmInputHandler}>
+            {buttonLabel}
+          </Button>
+        </View>
       </View>
     </>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    minWidth: 120,
+    marginHorizontal: 8,
+  },
+});
 
 export default ExpenseForm;
